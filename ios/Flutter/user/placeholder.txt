@@ -1,0 +1,2 @@
+Place your GoogleService-Info.plist for the user app here.
+Download this file from the Firebase Console after registering your iOS app with bundle ID: com.example.astro.user 
