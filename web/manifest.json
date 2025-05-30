@@ -1,6 +1,6 @@
 {
-    "name": "astro_app",
-    "short_name": "astro_app",
+    "name": "astro",
+    "short_name": "astro",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "astro_app" "\0"
+            VALUE "FileDescription", "astro" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "astro_app" "\0"
+            VALUE "InternalName", "astro" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "astro_app.exe" "\0"
-            VALUE "ProductName", "astro_app" "\0"
+            VALUE "OriginalFilename", "astro.exe" "\0"
+            VALUE "ProductName", "astro" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

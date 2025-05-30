@@ -1,4 +1,4 @@
-name: astro_app
+name: astro
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.8.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,31 +34,22 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  firebase_storage: ^11.5.6
-  firebase_app_check: ^0.2.1+8
-  google_sign_in: ^6.1.6
-  provider: ^6.1.1
-  shared_preferences: ^2.5.3
-  lottie: ^2.7.0
-  flutter_typeahead: ^5.2.0
-  http: ^1.4.0
-  path_provider: ^2.1.5
-  share_plus: ^11.0.0
-  intl: ^0.19.0
+  provider: ^6.1.2
+  firebase_core: ^2.27.1
+  firebase_auth: ^4.17.9
+  cloud_firestore: ^4.15.9
+  firebase_storage: ^11.6.10
+  flutter_dotenv: ^5.1.0
+  google_sign_in: ^6.2.1
+  flutter_svg: ^2.0.10+1
+  flutter_secure_storage: ^9.0.0
+  cloud_functions: ^4.7.6
+  local_auth: ^2.3.0
 
-dev_dependencies:  
-  flutter_flavorizr: ^2.1.0  
+dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
+  flutter_flavorizr: ^2.2.1
   flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
@@ -74,9 +65,13 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    # Common assets
     - assets/images/
-    - assets/loadingscreen.json
-  #   - images/a_dot_burr.jpeg
+    - assets/images/icons/
+    # Flavor-specific assets
+    - assets/images/user/
+    - assets/images/instructor/
+    - assets/images/admin/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -103,42 +98,33 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-flavorizr:  
-  flavors:  
-    user:  
-      app:  
-        name: "User App"  
-      android:  
-        applicationId: "com.example.astro.user"  
-      ios:  
-        bundleId: "com.example.astro.user"  
-    instructor:  
-      app:  
-        name: "Instructor App"  
-      android:  
-        applicationId: "com.example.astro.instructor"  
-      ios:  
-        bundleId: "com.example.astro.instructor"  
-    admin:  
-      app:  
-        name: "Admin App"  
-      android:  
-        applicationId: "com.example.astro.admin"  
-      ios:  
-        bundleId: "com.example.astro.admin"
-  instructions:
-    - assets:download
-    - assets:extract
-    - android:androidManifest
-    - android:flavorizrGradle
-    - android:buildGradle
-    - android:dummyAssets
-    - android:icons
-    - flutter:flavors
-    - flutter:app
-    - flutter:pages
-    - flutter:main
-    - google:firebase
-    - huawei:agconnect
-    - assets:clean
-    - ide:config
+
+# Flavorizr configuration
+flavorizr:
+  instructions: [
+    "assets:download",
+    "assets:extract", 
+    "android:androidManifest",
+    "android:flavorizrGradle", 
+    "android:buildGradle",
+    "android:dummyAssets",
+    "flutter:flavors",
+    "flutter:app",
+    "flutter:pages",
+    "flutter:main",
+    "assets:clean"
+  ]
+  app:
+    android:
+      flavorDimensions: "flavor-type"
+  flavors:
+    user:
+      app:
+        name: "Astro"
+      android:
+        applicationId: "com.example.astro.user"
+    admin:
+      app:
+        name: "Astro Admin"
+      android:
+        applicationId: "com.example.astro.admin"

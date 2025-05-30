@@ -1,74 +1,76 @@
-# Astro App
+# Astro Flutter App
 
-A Flutter application with multiple flavors for different user types: User, Instructor, and Admin.
+A Flutter application that serves three distinct roles: User, Instructor (Expert), and Admin, using Flutter Flavors.
 
-## Setup
+## Project Structure
 
-1. Make sure you have Flutter installed and set up on your machine.
-2. Clone this repository.
-3. Run `flutter pub get` to install dependencies.
+This project uses Flutter Flavors to create three separate apps from a single codebase:
 
-## Firebase Configuration
+- **User App**: For learners and consumers of content
+- **Instructor App**: For experts who create courses and content
+- **Admin App**: For platform administrators
 
-### Android
+## Getting Started
 
-Place the appropriate `google-services.json` files in the following directories:
+### Prerequisites
 
-- User App: `android/app/src/user/google-services.json`
-- Instructor App: `android/app/src/instructor/google-services.json`
-- Admin App: `android/app/src/admin/google-services.json`
+- Flutter SDK (3.8.0 or higher)
+- Dart SDK (3.0.0 or higher)
+- Android Studio / VS Code
 
-### iOS
+### Setup
 
-Place the appropriate `GoogleService-Info.plist` files in the following directories:
+1. Clone the repository
+2. Run `flutter pub get` to install dependencies
+3. Run the app with the desired flavor
 
-- User App: `ios/Flutter/user/GoogleService-Info.plist`
-- Instructor App: `ios/Flutter/instructor/GoogleService-Info.plist`
-- Admin App: `ios/Flutter/admin/GoogleService-Info.plist`
+### Running the App
 
-## Running the App
+#### Using Command Line
 
-### User App
-
-```bash
-flutter run --flavor user --dart-define=FLAVOR=user -t lib/main.dart
-```
-
-### Instructor App
+To run a specific flavor:
 
 ```bash
-flutter run --flavor instructor --dart-define=FLAVOR=instructor -t lib/main.dart
+# For User App
+flutter run --flavor user -t lib/main_user.dart
+
+# For Instructor App
+flutter run --flavor instructor -t lib/main_instructor.dart
+
+# For Admin App
+flutter run --flavor admin -t lib/main_admin.dart
 ```
 
-### Admin App
+#### Using VS Code
 
-For development:
+This project includes VS Code launch configurations for each flavor. Open the Run and Debug panel and select one of the following:
+
+- User App
+- Instructor App
+- Admin App
+
+### Building the App
+
+To build a specific flavor:
+
 ```bash
-flutter run --flavor admin --dart-define=FLAVOR=admin -t lib/main.dart
+# For User App - Android
+flutter build apk --flavor user -t lib/main_user.dart
+
+# For Instructor App - Android
+flutter build apk --flavor instructor -t lib/main_instructor.dart
+
+# For Admin App - Android
+flutter build apk --flavor admin -t lib/main_admin.dart
+
+# For iOS, replace 'apk' with 'ios'
 ```
 
-For web deployment:
-```bash
-flutter build web --dart-define=FLAVOR=admin
-```
+## Flavor Configuration
 
-## Features
-
-### User App
-- Browse courses
-- Book consultations
-- View learning materials
-- Track progress
-
-### Instructor App
-- Manage courses
-- Schedule live sessions
-- View earnings
-- Interact with students
-
-### Admin App
-- User management
-- Course management
-- Instructor management
-- Analytics dashboard
-- Payment reports
+Each flavor has its own:
+- App name
+- Bundle ID / Application ID
+- App icon (to be configured)
+- Theme
+- Backend configuration

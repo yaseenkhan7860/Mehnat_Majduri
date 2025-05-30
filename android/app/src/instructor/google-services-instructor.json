@@ -1,0 +1,126 @@
+{
+  "project_info": {
+    "project_number": "1072924359809",
+    "project_id": "astroapp-87ecd",
+    "storage_bucket": "astroapp-87ecd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072924359809:android:36afad1030a51656a6a180",
+        "android_client_info": {
+          "package_name": "com.example.astro_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072924359809:android:020850bdbfd3d9f9a6a180",
+        "android_client_info": {
+          "package_name": "com.example.astro_app.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072924359809:android:0e3e68a010d6257da6a180",
+        "android_client_info": {
+          "package_name": "com.example.astro_app.instructor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072924359809:android:868b2405fe0f4b93a6a180",
+        "android_client_info": {
+          "package_name": "com.example.astro_app.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072924359809-5rhcomirmich423ngotue8vhgarttjoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

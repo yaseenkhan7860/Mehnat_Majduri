@@ -1,0 +1,542 @@
+import 'package:flutter/material.dart';
+import 'package:astro/shared/screens/home_screen.dart';
+import 'package:astro/user_app/screens/course_list_screen.dart';
+import 'package:astro/user_app/screens/course_creator_screen.dart';
+import 'package:astro/shared/services/auth_service.dart';
+import 'package:astro/shared/services/user_service.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:astro/user_app/screens/user_courses_screen.dart';
+import 'package:astro/user_app/screens/user_live_screen.dart';
+import 'package:astro/user_app/screens/user_chat_screen.dart';
+import 'package:astro/user_app/screens/user_products_screen.dart';
+
+class UserHomeScreen extends StatefulWidget {
+  const UserHomeScreen({super.key});
+
+  @override
+  State<UserHomeScreen> createState() => _UserHomeScreenState();
+}
+
+class _UserHomeScreenState extends State<UserHomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const UserHomeContent(),
+    const UserCoursesScreen(),
+    const UserLiveScreen(),
+    const UserChatScreen(),
+    const UserProductsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: true,
+      appBar: AppBar(
+        title: const Text('User App'),
+        actions: [
+          // API settings button
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'API Settings',
+            onPressed: () {
+              // Navigate to API settings
+            },
+          ),
+          // Subscription button with improved UI
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.card_membership, size: 18),
+              label: const Text('Subscription', 
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                )
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple.shade800,
+                foregroundColor: Colors.white,
+                elevation: 3,
+                shadowColor: Colors.black.withOpacity(0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+              ),
+              onPressed: () {
+                // Navigate to subscription page
+              },
+            ),
+          ),
+          // Profile button
+          IconButton(
+            icon: const Icon(Icons.account_circle),
+            onPressed: () {
+              // Navigate to profile
+            },
+          ),
+        ],
+      ),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildBottomNavBar() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedItemColor: Theme.of(context).primaryColor,
+            unselectedItemColor: Colors.grey.shade400,
+            showSelectedLabels: true,
+            showUnselectedLabels: true,
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontSize: 11,
+            ),
+            elevation: 0,
+            items: [
+              _buildNavItem(Icons.home_outlined, Icons.home, 'Home', 0),
+              _buildNavItem(Icons.school_outlined, Icons.school, 'Courses', 1),
+              _buildNavItem(Icons.live_tv_outlined, Icons.live_tv, 'Live', 2),
+              _buildNavItem(Icons.chat_outlined, Icons.chat, 'Chat', 3),
+              _buildNavItem(Icons.shopping_bag_outlined, Icons.shopping_bag, 'Products', 4),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  BottomNavigationBarItem _buildNavItem(IconData unselectedIcon, IconData selectedIcon, String label, int index) {
+    return BottomNavigationBarItem(
+      icon: Icon(_currentIndex == index ? selectedIcon : unselectedIcon),
+      label: label,
+    );
+  }
+}
+
+// Home content widget
+class UserHomeContent extends StatelessWidget {
+  const UserHomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Welcome section
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade700,
+                  Colors.purple.shade700,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Icon(
+                  Icons.home,
+                  size: 40,
+                  color: Colors.white,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'Welcome to Astro App',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Explore your cosmic journey',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Daily horoscope card
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.sunny, color: Colors.amber, size: 28),
+                      SizedBox(width: 12),
+                      Text(
+                        'Your Daily Horoscope',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Divider(thickness: 1),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Today is a great day to explore new ideas and connect with those who share your interests. Your intuition is particularly strong today.',
+                    style: TextStyle(fontSize: 16, height: 1.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Navigate to full horoscope
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple.shade700,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      child: Text('Read Full Horoscope'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class UserHomeScreen extends SharedHomeScreen {
+  const UserHomeScreen({super.key});
+
+  @override
+  Widget buildBody(BuildContext context) {
+    // Use the AuthService to get the user's role
+    final authService = Provider.of<AuthService>(context);
+    final isInstructor = authService.isInstructor;
+    
+    // Show loading indicator while waiting for role
+    if (authService.currentUser != null && authService.userRole == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isInstructor 
+                ? 'Welcome to Astro Expert Platform' 
+                : 'Welcome to Astro Learning',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Show different content based on user role
+          if (isInstructor) ...[
+            _buildStatCard(
+              context,
+              'Students',
+              '120',
+              Icons.people,
+            ),
+            _buildStatCard(
+              context,
+              'Courses',
+              '8',
+              Icons.book,
+            ),
+            _buildStatCard(
+              context,
+              'Earnings',
+              '\$2,450',
+              Icons.attach_money,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const CourseCreatorScreen()),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Create New Course'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+              ),
+            ),
+          ] else ...[
+            _buildFeatureCard(
+              context,
+              'Find Courses',
+              'Browse our catalog of courses',
+              Icons.school,
+              () {
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const CourseListScreen()),
+                );
+              },
+            ),
+            _buildFeatureCard(
+              context,
+              'My Learning',
+              'Continue your enrolled courses',
+              Icons.play_lesson,
+              () {
+                // Navigate to my learning screen
+              },
+            ),
+            _buildFeatureCard(
+              context,
+              'Connect with Experts',
+              'Get personalized guidance',
+              Icons.people,
+              () {
+                // Navigate to experts list screen
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget buildDrawer(BuildContext context) {
+    // Use the AuthService to get the user's role
+    final authService = Provider.of<AuthService>(context);
+    final isInstructor = authService.isInstructor;
+    
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          _buildDrawerHeader(context, isInstructor),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
+            onTap: () {
+              Navigator.pop(context);
+              // Navigate to profile screen
+            },
+          ),
+          
+          // Conditional menu items based on role
+          if (isInstructor) ...[
+            ListTile(
+              leading: const Icon(Icons.create),
+              title: const Text('Create Course'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const CourseCreatorScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.insights),
+              title: const Text('Analytics'),
+              onTap: () {
+                Navigator.pop(context);
+                // Navigate to analytics screen
+              },
+            ),
+          ] else ...[
+            ListTile(
+              leading: const Icon(Icons.school),
+              title: const Text('Browse Courses'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const CourseListScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.play_lesson),
+              title: const Text('My Learning'),
+              onTap: () {
+                Navigator.pop(context);
+                // Navigate to my learning screen
+              },
+            ),
+          ],
+          
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              Navigator.pop(context);
+              // Navigate to settings screen
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
+            onTap: () async {
+              Navigator.pop(context);
+              await authService.signOut();
+              if (context.mounted) {
+                Navigator.of(context).pushReplacementNamed('/login');
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerHeader(BuildContext context, bool isInstructor) {
+    final authService = Provider.of<AuthService>(context);
+    
+    return DrawerHeader(
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.white,
+            child: Icon(
+              isInstructor ? Icons.school : Icons.person,
+              color: Theme.of(context).primaryColor,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            isInstructor ? 'Astro Expert' : 'Astro User',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+            ),
+          ),
+          Text(
+            authService.currentUser?.email ?? 'example@email.com',
+            style: const TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard(
+    BuildContext context,
+    String title,
+    String description,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        title: Text(title),
+        subtitle: Text(description),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+  
+  Widget _buildStatCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 16)),
+                Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+} 

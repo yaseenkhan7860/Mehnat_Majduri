@@ -9,17 +9,17 @@ android.apply {
         create("user") {
             dimension = "flavor-type"
             applicationId = "com.example.astro.user"
-            resValue(type = "string", name = "app_name", value = "User App")
+            resValue(type = "string", name = "app_name", value = "Astro User")
         }
         create("instructor") {
             dimension = "flavor-type"
             applicationId = "com.example.astro.instructor"
-            resValue(type = "string", name = "app_name", value = "Instructor App")
+            resValue(type = "string", name = "app_name", value = "Astro Expert")
         }
         create("admin") {
             dimension = "flavor-type"
             applicationId = "com.example.astro.admin"
-            resValue(type = "string", name = "app_name", value = "Admin App")
+            resValue(type = "string", name = "app_name", value = "Astro Admin")
         }
     }
 }

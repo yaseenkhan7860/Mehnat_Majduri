@@ -1,6 +1,5 @@
 enum Flavor {
   user,
-  instructor,
   admin,
 }
 
@@ -12,11 +11,9 @@ class F {
   static String get title {
     switch (appFlavor) {
       case Flavor.user:
-        return 'User App';
-      case Flavor.instructor:
-        return 'Instructor App';
+        return 'Astro';
       case Flavor.admin:
-        return 'Admin App';
+        return 'Astro Admin';
     }
   }
 

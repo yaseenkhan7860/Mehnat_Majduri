@@ -1,2 +1,0 @@
-Place your google-services.json for the instructor app here.
-Download this file from the Firebase Console after registering your app with package name: com.example.astro.instructor 
