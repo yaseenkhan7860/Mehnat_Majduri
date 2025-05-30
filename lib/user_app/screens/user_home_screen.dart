@@ -152,7 +152,7 @@ class UserHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 80.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -594,6 +594,20 @@ class UserHomeScreenShared extends SharedHomeScreen {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class UserCoursesScreen extends StatelessWidget {
+  const UserCoursesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 80.0),
+      child: Column(
+        // ... existing code ...
       ),
     );
   }
