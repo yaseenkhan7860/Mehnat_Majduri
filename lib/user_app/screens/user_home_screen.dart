@@ -263,6 +263,150 @@ class UserHomeContent extends StatelessWidget {
           
           const SizedBox(height: 24),
           
+          // Shortcut Options Label
+          Text(
+            'Shortcut Options',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Two feature cards side by side (Shortcut Options)
+          Row(
+            children: [
+              // Daily Horoscope Card - Left half
+              Expanded(
+                child: _buildFeatureCard(
+                  'Daily Horoscope',
+                  'Get your personalized daily predictions',
+                  Icons.wb_sunny_rounded,
+                  Colors.amber,
+                  Colors.amber.shade50,
+                  () {
+                    // Scroll to horoscope section
+                    Scrollable.ensureVisible(
+                      _horoscopeKey.currentContext!,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Free Kundali Card - Right half
+              Expanded(
+                child: _buildFeatureCard(
+                  'Free Kundali',
+                  'Discover your celestial blueprint',
+                  Icons.auto_graph,
+                  Colors.red,
+                  Colors.red.shade50,
+                  () {
+                    // Scroll to kundali section
+                    Scrollable.ensureVisible(
+                      _kundaliKey.currentContext!,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Banner Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Featured Offers',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                height: 180,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.deepPurple.shade400,
+                      Colors.deepPurple.shade800,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Special Offer',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Get 30% Off on Premium Consultations',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.deepPurple.shade800,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              ),
+                              child: const Text('Book Now'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Center(
+                          child: Icon(
+                            Icons.auto_awesome,
+                            size: 80,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
           // News and Articles section
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,50 +472,16 @@ class UserHomeContent extends StatelessWidget {
           
           const SizedBox(height: 24),
           
-          // Two feature cards side by side
-          Row(
-            children: [
-              // Daily Horoscope Card - Left half
-              Expanded(
-                child: _buildFeatureCard(
-                  'Daily Horoscope',
-                  'Get your personalized daily predictions',
-                  Icons.wb_sunny_rounded,
-                  Colors.amber,
-                  Colors.amber.shade50,
-                  () {
-                    // Scroll to horoscope section
-                    Scrollable.ensureVisible(
-                      _horoscopeKey.currentContext!,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Free Kundali Card - Right half
-              Expanded(
-                child: _buildFeatureCard(
-                  'Free Kundali',
-                  'Discover your celestial blueprint',
-                  Icons.auto_graph,
-                  Colors.red,
-                  Colors.red.shade50,
-                  () {
-                    // Scroll to kundali section
-                    Scrollable.ensureVisible(
-                      _kundaliKey.currentContext!,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                ),
-              ),
-            ],
+          // Section Headers
+          Text(
+            'Detailed Sections',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           
           // Daily horoscope details card with key for scrolling
           Card(
