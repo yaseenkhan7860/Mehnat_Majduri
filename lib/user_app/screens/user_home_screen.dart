@@ -35,16 +35,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        title: const Text('User App'),
+        title: const Text('AstroApp'),
         actions: [
-          // API settings button
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'API Settings',
-            onPressed: () {
-              // Navigate to API settings
-            },
-          ),
           // Subscription button with improved UI
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
@@ -71,12 +63,64 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               },
             ),
           ),
-          // Profile button
-          IconButton(
+          // Profile dropdown menu
+          PopupMenuButton<String>(
             icon: const Icon(Icons.account_circle),
-            onPressed: () {
-              // Navigate to profile
+            onSelected: (value) {
+              // Handle menu item selection
+              switch (value) {
+                case 'profile':
+                  // Navigate to profile page
+                  break;
+                case 'settings':
+                  // Navigate to settings page
+                  break;
+                case 'contact':
+                  // Navigate to contact us page
+                  break;
+                case 'privacy':
+                  // Navigate to privacy policy page
+                  break;
+              }
             },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'profile',
+                child: ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text('Profile'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'settings',
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('Settings'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'contact',
+                child: ListTile(
+                  leading: Icon(Icons.contact_support),
+                  title: Text('Contact Us'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'privacy',
+                child: ListTile(
+                  leading: Icon(Icons.privacy_tip),
+                  title: Text('Privacy Policy'),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -215,6 +259,71 @@ class UserHomeContent extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // News and Articles section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Latest News & Articles',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to all news/articles
+                    },
+                    child: Text('See All'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 180,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _buildNewsCard(
+                      'Understanding Planetary Transits',
+                      'Learn how planetary movements affect your life',
+                      'Dr. Sharma',
+                      '10 min read',
+                      Colors.indigo.shade100,
+                      Icons.article,
+                      Colors.indigo,
+                    ),
+                    const SizedBox(width: 16),
+                    _buildNewsCard(
+                      'Mercury Retrograde Explained',
+                      'What it means for your communication',
+                      'Astro Team',
+                      '5 min video',
+                      Colors.teal.shade100,
+                      Icons.play_circle_filled,
+                      Colors.teal,
+                    ),
+                    const SizedBox(width: 16),
+                    _buildNewsCard(
+                      'Full Moon Rituals',
+                      'Harness the energy of the full moon',
+                      'Maya Patel',
+                      '8 min read',
+                      Colors.purple.shade100,
+                      Icons.article,
+                      Colors.purple,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           
           const SizedBox(height: 24),
@@ -377,6 +486,75 @@ class UserHomeContent extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildNewsCard(String title, String description, String author, String duration, Color bgColor, IconData icon, Color iconColor) {
+    return Container(
+      width: 250,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: () {
+          // Open news/article
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, color: iconColor),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                style: TextStyle(fontSize: 14),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const Spacer(),
+              Divider(thickness: 1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    author,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    duration,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
