@@ -260,8 +260,8 @@ class UserHomeContent extends StatelessWidget {
   }
 }
 
-class UserHomeScreen extends SharedHomeScreen {
-  const UserHomeScreen({super.key});
+class UserHomeScreenShared extends SharedHomeScreen {
+  const UserHomeScreenShared({super.key});
 
   @override
   Widget buildBody(BuildContext context) {
