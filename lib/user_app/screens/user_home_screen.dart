@@ -255,6 +255,63 @@ class UserHomeContent extends StatelessWidget {
               ),
             ),
           ),
+          
+          const SizedBox(height: 24),
+          
+          // Kundali Card
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.stars, color: Colors.purple, size: 28),
+                      SizedBox(width: 12),
+                      Text(
+                        'Your Kundali Chart',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Divider(thickness: 1),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Discover your celestial blueprint with a personalized Kundali chart. Gain insights into your personality, relationships, career, and life path based on your birth details.',
+                    style: TextStyle(fontSize: 16, height: 1.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.center,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        // Navigate to Kundali view
+                      },
+                      icon: Icon(Icons.visibility),
+                      label: Text('View Your Kundali'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple.shade700,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
