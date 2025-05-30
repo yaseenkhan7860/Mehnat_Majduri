@@ -156,53 +156,112 @@ class UserHomeContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome section
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.blue.shade700,
-                  Colors.purple.shade700,
-                ],
-              ),
+          // Sloka of the day section
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Icon(
-                  Icons.home,
-                  size: 40,
-                  color: Colors.white,
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'Welcome to Astro App',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.auto_stories, color: Colors.deepOrange, size: 28),
+                      SizedBox(width: 12),
+                      Text(
+                        'Sloka of the Day',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Explore your cosmic journey',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
+                  const SizedBox(height: 12),
+                  Divider(thickness: 1),
+                  const SizedBox(height: 12),
+                  Text(
+                    'सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज । अहं त्वा सर्वपापेभ्यो मोक्षयिष्यामि मा शुचः ॥',
+                    style: TextStyle(
+                      fontSize: 16, 
+                      height: 1.5,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Abandoning all duties, take refuge in Me alone. I shall liberate you from all sins; do not grieve.',
+                    style: TextStyle(fontSize: 14, height: 1.5),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '- Bhagavad Gita, Chapter 18, Verse 66',
+                    style: TextStyle(
+                      fontSize: 12, 
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey.shade700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
           
           const SizedBox(height: 24),
           
-          // Daily horoscope card
+          // Grid of features (2x2)
+          GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            children: [
+              _buildFeatureCard(
+                'Daily Horoscope',
+                Icons.wb_sunny_rounded,
+                Colors.amber,
+                () {
+                  // Navigate to horoscope screen
+                },
+              ),
+              _buildFeatureCard(
+                'Free Kundali',
+                Icons.auto_graph,
+                Colors.red,
+                () {
+                  // Navigate to kundali screen
+                },
+              ),
+              _buildFeatureCard(
+                'Kundali Matching',
+                Icons.favorite,
+                Colors.green,
+                () {
+                  // Navigate to matching screen
+                },
+              ),
+              _buildFeatureCard(
+                'Shopping',
+                Icons.shopping_bag,
+                Colors.blue,
+                () {
+                  // Navigate to shopping screen
+                },
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Daily horoscope details card
           Card(
             elevation: 4,
             shape: RoundedRectangleBorder(
@@ -313,6 +372,41 @@ class UserHomeContent extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildFeatureCard(String title, IconData iconData, Color color, VoidCallback onTap) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                iconData,
+                size: 48,
+                color: color,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
