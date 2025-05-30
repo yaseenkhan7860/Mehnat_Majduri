@@ -145,7 +145,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 }
 
-// Home content widget
+// Keys for scrolling to sections
+final _horoscopeKey = GlobalKey();
+final _kundaliKey = GlobalKey();
+
 class UserHomeContent extends StatelessWidget {
   const UserHomeContent({super.key});
 
@@ -216,53 +219,54 @@ class UserHomeContent extends StatelessWidget {
           
           const SizedBox(height: 24),
           
-          // Grid of features (2x2)
-          GridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+          // Two feature cards side by side
+          Row(
             children: [
-              _buildFeatureCard(
-                'Daily Horoscope',
-                Icons.wb_sunny_rounded,
-                Colors.amber,
-                () {
-                  // Navigate to horoscope screen
-                },
+              // Daily Horoscope Card - Left half
+              Expanded(
+                child: _buildFeatureCard(
+                  'Daily Horoscope',
+                  'Get your personalized daily predictions',
+                  Icons.wb_sunny_rounded,
+                  Colors.amber,
+                  Colors.amber.shade50,
+                  () {
+                    // Scroll to horoscope section
+                    Scrollable.ensureVisible(
+                      _horoscopeKey.currentContext!,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
               ),
-              _buildFeatureCard(
-                'Free Kundali',
-                Icons.auto_graph,
-                Colors.red,
-                () {
-                  // Navigate to kundali screen
-                },
-              ),
-              _buildFeatureCard(
-                'Kundali Matching',
-                Icons.favorite,
-                Colors.green,
-                () {
-                  // Navigate to matching screen
-                },
-              ),
-              _buildFeatureCard(
-                'Shopping',
-                Icons.shopping_bag,
-                Colors.blue,
-                () {
-                  // Navigate to shopping screen
-                },
+              const SizedBox(width: 16),
+              // Free Kundali Card - Right half
+              Expanded(
+                child: _buildFeatureCard(
+                  'Free Kundali',
+                  'Discover your celestial blueprint',
+                  Icons.auto_graph,
+                  Colors.red,
+                  Colors.red.shade50,
+                  () {
+                    // Scroll to kundali section
+                    Scrollable.ensureVisible(
+                      _kundaliKey.currentContext!,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
               ),
             ],
           ),
           
           const SizedBox(height: 24),
           
-          // Daily horoscope details card
+          // Daily horoscope details card with key for scrolling
           Card(
+            key: _horoscopeKey,
             elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -317,8 +321,9 @@ class UserHomeContent extends StatelessWidget {
           
           const SizedBox(height: 24),
           
-          // Kundali Card
+          // Kundali Card with key for scrolling
           Card(
+            key: _kundaliKey,
             elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -376,10 +381,10 @@ class UserHomeContent extends StatelessWidget {
     );
   }
   
-  Widget _buildFeatureCard(String title, IconData iconData, Color color, VoidCallback onTap) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
+  Widget _buildFeatureCard(String title, String description, IconData iconData, Color iconColor, Color backgroundColor, VoidCallback onTap) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: InkWell(
@@ -389,11 +394,12 @@ class UserHomeContent extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(
                 iconData,
                 size: 48,
-                color: color,
+                color: iconColor,
               ),
               const SizedBox(height: 12),
               Text(
@@ -401,6 +407,15 @@ class UserHomeContent extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade700,
                 ),
                 textAlign: TextAlign.center,
               ),
