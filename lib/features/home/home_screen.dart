@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:astro/config/flavor_config.dart';
-import 'package:astro/features/admin/screens/user_management_screen.dart';
-import 'package:astro/features/auth/services/auth_service.dart';
+import 'package:astro/admin_app/screens/admin_home_screen.dart';
+import 'package:astro/shared/services/auth_service.dart';
 import 'package:astro/features/courses/screens/course_creator_screen.dart';
 import 'package:astro/features/courses/screens/course_list_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -58,26 +59,27 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  radius: 30,
+                  radius: 30.r,
                   backgroundColor: Colors.white,
                   child: Icon(
                     _getFlavorIcon(),
                     color: FlavorConfig.instance.primaryColor,
-                    size: 30,
+                    size: 30.sp,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10.h),
                 Text(
                   FlavorConfig.instance.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 24.sp,
                   ),
                 ),
-                const Text(
+                Text(
                   'example@email.com',
                   style: TextStyle(
                     color: Colors.white70,
+                    fontSize: 14.sp,
                   ),
                 ),
               ],
@@ -172,7 +174,7 @@ class HomeScreen extends StatelessWidget {
             Navigator.pop(context);
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (context) => const UserManagementScreen()),
+              MaterialPageRoute(builder: (context) => const AdminHomeScreen()),
             );
           },
         ),
@@ -221,18 +223,18 @@ class UserHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Welcome to Astro User App',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           _buildFeatureCard(
             context,
             'Find Courses',
@@ -276,12 +278,12 @@ class UserHomeContent extends StatelessWidget {
     VoidCallback onTap,
   ) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(title),
-        subtitle: Text(description),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        leading: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24.sp),
+        title: Text(title, style: TextStyle(fontSize: 16.sp)),
+        subtitle: Text(description, style: TextStyle(fontSize: 14.sp)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16.sp),
         onTap: onTap,
       ),
     );
@@ -294,22 +296,22 @@ class AdminHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Admin Dashboard',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           GridView.count(
             crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            crossAxisSpacing: 16.w,
+            mainAxisSpacing: 16.h,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [
@@ -319,15 +321,15 @@ class AdminHomeContent extends StatelessWidget {
               _buildAdminCard(context, 'Revenue', '\$24,530', Icons.money),
             ],
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: 24.h),
+          Text(
             'Quick Actions',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 20.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           _buildActionButton(
             context, 
             'Manage Users', 
@@ -335,7 +337,7 @@ class AdminHomeContent extends StatelessWidget {
             () {
               Navigator.push(
                 context, 
-                MaterialPageRoute(builder: (context) => const UserManagementScreen()),
+                MaterialPageRoute(builder: (context) => const AdminHomeScreen()),
               );
             },
           ),
@@ -364,27 +366,27 @@ class AdminHomeContent extends StatelessWidget {
     return Card(
       color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              size: 40,
+              size: 40.sp,
               color: Theme.of(context).colorScheme.primary,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(
               value,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
             Text(
               title,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16.sp),
             ),
           ],
         ),
@@ -394,9 +396,9 @@ class AdminHomeContent extends StatelessWidget {
 
   Widget _buildActionButton(BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-      title: Text(title),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24.sp),
+      title: Text(title, style: TextStyle(fontSize: 16.sp)),
+      trailing: Icon(Icons.arrow_forward_ios, size: 16.sp),
       onTap: onTap,
     );
   }

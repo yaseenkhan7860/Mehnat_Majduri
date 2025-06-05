@@ -1,124 +1,171 @@
 import 'package:flutter/material.dart';
 
-class UserCoursesScreen extends StatelessWidget {
+class UserCoursesScreen extends StatefulWidget {
   const UserCoursesScreen({super.key});
 
   @override
+  State<UserCoursesScreen> createState() => _UserCoursesScreenState();
+}
+
+class _UserCoursesScreenState extends State<UserCoursesScreen> {
+  int _selectedCategoryIndex = 0;
+  final List<String> _categories = ['Featured', 'Astrology', 'Numerology', 'Tarot', 'Vastu'];
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 80.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.blue.shade600,
-                  Colors.blue.shade800,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Icon(
-                  Icons.school,
-                  size: 40,
-                  color: Colors.white,
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'Courses',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Learn at your own pace',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Course categories
-          const Text(
-            'Categories',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          
-          // Category grid
-          GridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+    return Column(
+      children: [
+        _buildCategoryNavBar(),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(16.0),
             children: [
-              _buildCategoryCard('Astrology Basics', Icons.stars, Colors.purple.shade700),
-              _buildCategoryCard('Tarot Reading', Icons.auto_stories, Colors.red.shade700),
-              _buildCategoryCard('Numerology', Icons.tag, Colors.green.shade700),
-              _buildCategoryCard('Meditation', Icons.self_improvement, Colors.orange.shade700),
-            ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Popular courses
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+              const SizedBox(height: 16),
+              
+              // Course categories
               const Text(
-                'Popular Courses',
+                'Categories',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('See All'),
+              const SizedBox(height: 16),
+              
+              // Category grid
+              GridView.count(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildCategoryCard('Astrology Basics', Icons.stars, Colors.purple.shade700),
+                  _buildCategoryCard('Tarot Reading', Icons.auto_stories, Colors.red.shade700),
+                  _buildCategoryCard('Numerology', Icons.tag, Colors.green.shade700),
+                  _buildCategoryCard('Meditation', Icons.self_improvement, Colors.orange.shade700),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Popular courses
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _getCoursesSectionTitle(),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('See All'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
+              // Course cards
+              _buildCourseCard(
+                title: 'Introduction to Astrology',
+                instructor: 'Prof. Jane Smith',
+                duration: '8 hours',
+                level: 'Beginner',
+              ),
+              const SizedBox(height: 16),
+              _buildCourseCard(
+                title: 'Advanced Tarot Reading',
+                instructor: 'Dr. Michael Brown',
+                duration: '12 hours',
+                level: 'Intermediate',
+              ),
+              const SizedBox(height: 16),
+              _buildCourseCard(
+                title: 'Numerology Fundamentals',
+                instructor: 'Sarah Johnson',
+                duration: '6 hours',
+                level: 'Beginner',
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          
-          // Course cards
-          _buildCourseCard(
-            title: 'Introduction to Astrology',
-            instructor: 'Prof. Jane Smith',
-            duration: '8 hours',
-            level: 'Beginner',
-          ),
-          const SizedBox(height: 16),
-          _buildCourseCard(
-            title: 'Advanced Tarot Reading',
-            instructor: 'Dr. Michael Brown',
-            duration: '12 hours',
-            level: 'Intermediate',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryNavBar() {
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 3,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _categories.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              setState(() {
+                _selectedCategoryIndex = index;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: _selectedCategoryIndex == index 
+                        ? Theme.of(context).primaryColor 
+                        : Colors.transparent,
+                    width: 3,
+                  ),
+                ),
+              ),
+              child: Text(
+                _categories[index],
+                style: TextStyle(
+                  color: _selectedCategoryIndex == index 
+                      ? Theme.of(context).primaryColor 
+                      : Colors.grey.shade700,
+                  fontWeight: _selectedCategoryIndex == index 
+                      ? FontWeight.bold 
+                      : FontWeight.normal,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
+  }
+
+  String _getCoursesSectionTitle() {
+    switch (_selectedCategoryIndex) {
+      case 0:
+        return 'Popular Courses';
+      case 1:
+        return 'Astrology Courses';
+      case 2:
+        return 'Numerology Courses';
+      case 3:
+        return 'Tarot Courses';
+      case 4:
+        return 'Vastu Courses';
+      default:
+        return 'Popular Courses';
+    }
   }
 
   Widget _buildCategoryCard(String title, IconData icon, Color color) {

@@ -24,6 +24,8 @@ class AssetResolver {
         return 'assets/images/user/user_logo.png';
       case Flavor.admin:
         return 'assets/images/admin/admin_logo.png';
+      case Flavor.instructor:
+        return 'assets/images/user/user_logo.png';
     }
   }
 
@@ -34,6 +36,8 @@ class AssetResolver {
         return 'assets/images/user/splash.png';
       case Flavor.admin:
         return 'assets/images/admin/splash.png';
+      case Flavor.instructor:
+        return 'assets/images/user/splash.png';
     }
   }
 } 

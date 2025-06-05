@@ -1,26 +1,96 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // User-specific data
+    // Function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Function to check if user is an instructor
+    function isInstructor() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/instructors/$(request.auth.uid));
+    }
+    
+    // Function to check if user is a regular user
+    function isRegularUser() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    // Function to check if user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Admin collection - only admins can read all, users can only read their own
+    match /admins/{adminId} {
+      allow read: if isOwner(adminId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Instructors collection - admins can read/write all, instructors can read/write their own
+    match /instructors/{instructorId} {
+      // Allow querying by email for authentication purposes
+      allow read: if isAdmin() || isOwner(instructorId) || 
+                    (request.auth != null && request.query.limit <= 1 && 
+                     'email' in request.query.filters);
+      allow write: if isAdmin() || (isOwner(instructorId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isInstructor']));
+    }
+
+    // Users collection - admins can read/write all, users can read/write their own
     match /users/{userId} {
-      allow read: if request.auth.uid == userId || 
-                    request.auth.token.role == 'admin';
-      allow write: if request.auth.uid == userId;
+      // Allow querying by email for authentication purposes
+      allow read: if isAdmin() || isOwner(userId) || 
+                    (request.auth != null && request.query.limit <= 1 && 
+                     'email' in request.query.filters);
+      allow write: if isAdmin() || (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isUser']));
     }
-    
-    // Course data - admins can do anything, instructors can create and edit their own
+
+    // Admin logs collection - only admins can access
+    match /admin_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Courses collection - admins and instructors can create/edit, all authenticated users can read
     match /courses/{courseId} {
-      allow read: if true; // All authenticated users can read courses
-      allow create: if request.auth.token.role == 'instructor' || 
-                      request.auth.token.role == 'admin';
-      allow update, delete: if request.auth.token.role == 'admin' || 
-                              (request.auth.token.role == 'instructor' && 
-                               resource.data.instructorId == request.auth.uid);
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() || isInstructor();
+      allow update, delete: if isAdmin() || (isInstructor() && resource.data.instructorId == request.auth.uid);
     }
     
-    // Admin-only data
-    match /admin/{document=**} {
-      allow read, write: if request.auth.token.role == 'admin';
+    // Sessions collection - admins can read/write all, instructors can manage their own sessions
+    match /sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() || isInstructor();
+      allow update, delete: if isAdmin() || (isInstructor() && resource.data.instructorId == request.auth.uid);
+    }
+    
+    // Chat messages - users can read/write their own chats
+    match /chats/{chatId} {
+      allow read: if isAuthenticated() && (
+        resource.data.participantIds.hasAny([request.auth.uid])
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.participantIds.hasAny([request.auth.uid])
+      );
+    }
+    
+    match /chats/{chatId}/messages/{messageId} {
+      allow read: if isAuthenticated() && (
+        get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds.hasAny([request.auth.uid])
+      );
+      allow create: if isAuthenticated() && (
+        get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds.hasAny([request.auth.uid])
+      );
     }
   }
 }

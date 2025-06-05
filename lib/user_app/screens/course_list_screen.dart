@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:astro/flavors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CourseListScreen extends StatelessWidget {
   const CourseListScreen({super.key});
@@ -27,14 +28,14 @@ class CourseListScreen extends StatelessWidget {
         title: const Text('Available Courses'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         children: [
           _buildCategoryHeader(context, 'Featured Courses'),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           _buildHorizontalCourseList(context),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _buildCategoryHeader(context, 'All Courses'),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           ...List.generate(
             10,
             (index) => _buildCourseCard(
@@ -61,49 +62,49 @@ class CourseListScreen extends StatelessWidget {
 
   Widget _buildHorizontalCourseList(BuildContext context) {
     return SizedBox(
-      height: 220,
+      height: 220.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 5,
         itemBuilder: (context, index) {
           return Container(
-            width: 280,
-            margin: const EdgeInsets.only(right: 16),
+            width: 280.w,
+            margin: EdgeInsets.only(right: 16.w),
             child: Card(
               clipBehavior: Clip.antiAlias,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: 120,
+                    height: 120.h,
                     color: Colors.blue.shade200,
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.school,
-                      size: 60,
+                      size: 60.sp,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: EdgeInsets.all(12.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Featured Course ${index + 1}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         Text(
                           'Learn the essentials of this subject with our expert instructors',
                           style: TextStyle(
                             color: Colors.grey.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -128,9 +129,9 @@ class CourseListScreen extends StatelessWidget {
     String price,
   ) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -138,45 +139,49 @@ class CourseListScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 80.w,
+                  height: 80.h,
                   decoration: BoxDecoration(
                     color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: const Icon(Icons.book, size: 40),
+                  child: Icon(Icons.book, size: 40.sp),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 18.sp,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         description,
                         style: TextStyle(
                           color: Colors.grey.shade700,
+                          fontSize: 14.sp,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.h),
                       Row(
                         children: [
                           Icon(
                             Icons.star,
-                            size: 16,
+                            size: 16.sp,
                             color: Colors.amber.shade700,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4.w),
                           Text(
                             rating,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
+                            ),
                           ),
                           const Spacer(),
                           Text(
@@ -184,7 +189,7 @@ class CourseListScreen extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.primary,
-                              fontSize: 16,
+                              fontSize: 16.sp,
                             ),
                           ),
                         ],
@@ -194,11 +199,11 @@ class CourseListScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(40),
+                minimumSize: Size.fromHeight(40.h),
               ),
               child: const Text('Enroll Now'),
             ),

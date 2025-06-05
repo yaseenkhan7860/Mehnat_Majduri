@@ -1,0 +1,15 @@
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path_android: "assets/images/admin/admin_app.jpg"
+  image_path_ios: "assets/images/admin/admin_app.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF" # White background
+  adaptive_icon_foreground: "assets/images/admin/admin_app.jpg"
+  web:
+    generate: false
+  windows:
+    generate: false
+  macos:
+    generate: false 

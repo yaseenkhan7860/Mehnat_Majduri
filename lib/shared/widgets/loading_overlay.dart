@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
@@ -20,8 +21,12 @@ class LoadingOverlay extends StatelessWidget {
         if (isLoading)
           Container(
             color: color ?? Colors.black.withOpacity(0.3),
-            child: const Center(
-              child: CircularProgressIndicator(),
+            child: Center(
+              child: SizedBox(
+                width: 50.w,
+                height: 50.w,
+                child: const CircularProgressIndicator(),
+              ),
             ),
           ),
       ],

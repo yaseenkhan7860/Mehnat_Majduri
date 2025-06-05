@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:astro/shared/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:astro/core/theme/app_themes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
@@ -109,19 +111,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.verified,
                 color: Colors.green,
-                size: 100,
+                size: 80.sp,
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20.h),
+              Text(
                 'Email Verified!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10),
-              const Text('Redirecting to home...'),
-              const SizedBox(height: 20),
+              SizedBox(height: 10.h),
+              Text(
+                'Redirecting to home...',
+                style: TextStyle(fontSize: 14.sp),
+              ),
+              SizedBox(height: 20.h),
               const CircularProgressIndicator(),
             ],
           ),
@@ -134,46 +139,47 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         title: const Text('Verify Your Email'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.email,
-              size: 80,
-              color: Colors.blue,
+              size: 60.sp,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20.h),
+            Text(
               'Verify Your Email',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Text(
               'We\'ve sent a verification email to ${FirebaseAuth.instance.currentUser?.email}',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16.sp),
             ),
-            const SizedBox(height: 10),
-            const Text(
+            SizedBox(height: 10.h),
+            Text(
               'Please check your inbox and click the verification link to activate your account.',
               textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14.sp),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30.h),
             ElevatedButton(
               onPressed: _canResendEmail ? _sendVerificationEmail : null,
               child: _canResendEmail
                   ? const Text('Resend Verification Email')
                   : Text('Resend in $_cooldownSeconds seconds'),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             TextButton(
               onPressed: () {
                 _checkEmailVerified();
               },
               child: const Text('I\'ve verified my email'),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             TextButton(
               onPressed: () async {
                 await Provider.of<AuthService>(context, listen: false).signOut();

@@ -7,14 +7,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:astro/main.dart';
 import 'package:astro/app.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const App());
+    // The App widget already includes ScreenUtilInit, so we don't need to wrap it again
+    await tester.pumpWidget(const App(flavor: 'user'));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

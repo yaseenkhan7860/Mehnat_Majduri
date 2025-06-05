@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum UserRole {
   user,
@@ -41,18 +42,18 @@ class _RoleSelectionDialogState extends State<RoleSelectionDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             'Please select how you want to use Astro:',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16.sp),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           _buildRoleOption(
             UserRole.user,
             'Student',
             'Learn from courses and connect with experts',
             Icons.person,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           _buildRoleOption(
             UserRole.instructor,
             'Instructor',
@@ -87,15 +88,15 @@ class _RoleSelectionDialogState extends State<RoleSelectionDialog> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           border: Border.all(
             color: isSelected
                 ? Theme.of(context).colorScheme.primary
                 : Colors.grey.shade300,
-            width: 2,
+            width: 2.w,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.r),
           color: isSelected
               ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
               : null,
@@ -107,9 +108,9 @@ class _RoleSelectionDialogState extends State<RoleSelectionDialog> {
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
                   : Colors.grey,
-              size: 32,
+              size: 32.sp,
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,18 +118,18 @@ class _RoleSelectionDialogState extends State<RoleSelectionDialog> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: isSelected
                           ? Theme.of(context).colorScheme.primary
                           : null,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       color: Colors.grey.shade700,
                     ),
                   ),
@@ -139,6 +140,7 @@ class _RoleSelectionDialogState extends State<RoleSelectionDialog> {
               Icon(
                 Icons.check_circle,
                 color: Theme.of(context).colorScheme.primary,
+                size: 20.sp,
               ),
           ],
         ),

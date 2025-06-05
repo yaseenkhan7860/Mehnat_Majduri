@@ -6,6 +6,7 @@ import 'package:astro/shared/services/user_service.dart';
 import 'package:astro/shared/widgets/role_selection_dialog.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -39,15 +40,21 @@ class AuthService extends ChangeNotifier {
     _auth.authStateChanges().listen((User? user) async {
       _user = user;
       if (user != null) {
-        // Fetch and store user role using Cloud Function
-        await _fetchUserRole();
-        
-        // Store user ID securely
-        await _storage.write(key: 'user_id', value: user.uid);
-        
-        // Store user role securely
-        if (_userRole != null) {
-          await _storage.write(key: 'user_role', value: _userRole);
+        try {
+          // Fetch and store user role using Firestore
+          await _fetchUserRole();
+          
+          // Store user ID securely
+          await _storage.write(key: 'user_id', value: user.uid);
+          
+          // Store user role securely
+          if (_userRole != null) {
+            await _storage.write(key: 'user_role', value: _userRole);
+          }
+        } catch (e) {
+          debugPrint('Error during auth state change: $e');
+          // Set default role to prevent crashes
+          _userRole = F.appFlavor == Flavor.admin ? 'admin' : 'user';
         }
       } else {
         _userRole = null;
@@ -73,13 +80,29 @@ class AuthService extends ChangeNotifier {
   // Fetch user role using Cloud Function
   Future<void> _fetchUserRole() async {
     try {
-      final result = await _functions.httpsCallable('verifyUserRole').call();
-      final data = result.data;
-      _userRole = data['role'];
+      // For admin app, always set admin role
+      if (F.appFlavor == Flavor.admin) {
+        _userRole = 'admin';
+        // Ensure admin record exists in Firestore
+        await _userService.setUserRole(_user!, 'admin');
+        return;
+      }
+
+      // For user app, get role from Firestore
+      _userRole = await _userService.getUserRole(_user!.uid);
+      debugPrint('Fetched user role: $_userRole for ${_user!.email}');
+      
+      // If role is not set, set default based on app flavor and email
+      if (_userRole == null) {
+        // For user app, default to 'user' role
+        _userRole = 'user';
+        // Save role to Firestore
+        await _userService.setUserRole(_user!, _userRole!);
+      }
     } catch (e) {
       debugPrint('Error fetching user role: $e');
-      // Fallback to Firestore if Cloud Function fails
-      _userRole = await _userService.getUserRole(_user!.uid);
+      await signOut();
+      rethrow;
     }
     notifyListeners();
   }
@@ -210,16 +233,23 @@ class AuthService extends ChangeNotifier {
         );
       }
       
-      // Call the Cloud Function to create the instructor account
-      final result = await _functions.httpsCallable('createInstructorAccount').call({
-        'email': email,
-        'password': password,
-        'displayName': name,
-      });
+      // Create the user account in Firebase Auth
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       
-      if (!result.data['success']) {
-        throw Exception('Failed to create instructor account');
-      }
+      // Create instructor document in Firestore
+      await _userService.setUserRole(
+        userCredential.user!,
+        'instructor',
+        displayName: name,
+      );
+      
+      // Send email verification
+      await userCredential.user?.sendEmailVerification();
+      
+      debugPrint('Instructor account created successfully for $email');
     } catch (e) {
       debugPrint('Create instructor error: $e');
       rethrow;
@@ -235,33 +265,67 @@ class AuthService extends ChangeNotifier {
     await _storage.delete(key: 'user_role');
   }
 
-  // Verify that the user's role matches the app flavor
+  // Verify user role matches the app flavor
   Future<void> _verifyUserRole(User? user) async {
     if (user == null) return;
     
     try {
-      // Fetch user role using Cloud Function
-      await _fetchUserRole();
-      
-      // Check if the user has the correct role for this app flavor
-      switch (F.appFlavor) {
-        case Flavor.user:
-          // Both user and instructor roles are valid for the user app
-          if (_userRole != 'user' && _userRole != 'instructor') {
-            await signOut();
-            throw Exception('You do not have permission to access this app.');
-          }
-          break;
-        case Flavor.admin:
-          if (_userRole != 'admin') {
-            await signOut();
-            throw Exception('You do not have permission to access the Admin app.');
-          }
-          break;
+      // For admin app, only allow admin role
+      if (F.appFlavor == Flavor.admin) {
+        final role = await _userService.getUserRole(user.uid);
+        debugPrint('Admin app - User role: $role for ${user.email}');
+        
+        if (role != 'admin') {
+          await signOut();
+          throw Exception('Please use the user app to sign in. This app is for administrators only.');
+        }
+        
+        _userRole = 'admin';
+        // Ensure admin record exists in Firestore
+        await _userService.setUserRole(user, 'admin');
+        notifyListeners();
+        return;
       }
+      
+      // For user app, check role
+      final role = await _userService.getUserRole(user.uid);
+      debugPrint('User app - User role: $role for ${user.email}');
+      
+      // For user app, allow both user and instructor roles
+      if (role == 'admin') {
+        await signOut();
+        throw Exception('Please use the admin app to sign in as an administrator.');
+      }
+      
+      if (role == 'instructor') {
+        _userRole = 'instructor';
+        // Ensure instructor record exists in Firestore
+        await _userService.setUserRole(user, 'instructor');
+        notifyListeners();
+        return;
+      }
+      
+      if (role == 'user' || role == null) {
+        _userRole = 'user';
+        // If role is null, set it to user
+        if (role == null) {
+          await _userService.setUserRole(user, 'user');
+        }
+        notifyListeners();
+        return;
+      }
+      
+      // If we get here, the role is invalid
+      await signOut();
+      throw Exception('Invalid user role. Please contact support.');
     } catch (e) {
+      if (e is Exception && e.toString().contains('Please use')) {
+        // Rethrow our custom exceptions
+        rethrow;
+      }
       debugPrint('Error verifying user role: $e');
-      rethrow;
+      await signOut();
+      throw Exception('Error verifying user role: $e');
     }
   }
 
@@ -278,6 +342,9 @@ class AuthService extends ChangeNotifier {
       case Flavor.admin:
         role = 'admin';
         break;
+      case Flavor.instructor:
+        role = 'instructor';
+        break;
     }
     
     // Set user role using Cloud Function
@@ -293,14 +360,43 @@ class AuthService extends ChangeNotifier {
   // Set user role using Cloud Function
   Future<void> _setUserRoleWithFunction(String uid, String role) async {
     try {
-      await _functions.httpsCallable('setUserRole').call({
-        'uid': uid,
-        'role': role,
-      });
+      // Skip the Cloud Function call and use Firestore directly
+      User? currentUser = await _auth.currentUser;
+      if (currentUser != null) {
+        // Check if this user already exists in another collection
+        if (role == 'user') {
+          // Check if user exists in instructors collection
+          final instructorDoc = await FirebaseFirestore.instance
+              .collection('instructors')
+              .doc(uid)
+              .get();
+          
+          if (instructorDoc.exists) {
+            debugPrint('User exists in instructors collection, not saving to users collection');
+            return;
+          }
+        } else if (role == 'instructor') {
+          // Check if user exists in users collection
+          final userDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .get();
+          
+          if (userDoc.exists) {
+            debugPrint('User exists in users collection, removing from users collection');
+            // Remove from users collection if they are now an instructor
+            await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+          }
+        }
+        
+        // Save user data in the appropriate collection
+        await _userService.setUserRole(currentUser, role);
+      } else {
+        debugPrint('Error: No current user found when setting role');
+      }
     } catch (e) {
-      debugPrint('Error setting user role with function: $e');
-      // Fallback to Firestore if Cloud Function fails
-      await _userService.setUserRole(await _auth.currentUser!, role);
+      debugPrint('Error setting user role: $e');
+      // No fallback needed since we're already using Firestore directly
     }
   }
   

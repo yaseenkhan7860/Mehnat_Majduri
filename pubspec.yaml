@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.0
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,24 +33,28 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  provider: ^6.1.2
-  firebase_core: ^2.27.1
-  firebase_auth: ^4.17.9
-  cloud_firestore: ^4.15.9
-  firebase_storage: ^11.6.10
-  flutter_dotenv: ^5.1.0
-  google_sign_in: ^6.2.1
-  flutter_svg: ^2.0.10+1
-  flutter_secure_storage: ^9.0.0
-  cloud_functions: ^4.7.6
-  local_auth: ^2.3.0
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.5
+  flutter_screenutil: ^5.7.0
+  cloud_firestore: ^4.8.0
+  firebase_auth: ^4.6.3
+  firebase_core: ^2.13.1
+  fl_chart: ^0.63.0
+  intl: ^0.18.1
+  path_provider: ^2.0.15
+  csv: ^5.0.2
+  google_sign_in: ^6.1.0
+  cloud_functions: ^4.3.0
+  flutter_svg: ^2.0.5
+  package_info_plus: ^4.0.0
+  flutter_secure_storage: ^8.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_flavorizr: ^2.2.1
-  flutter_lints: ^5.0.0
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -128,3 +132,36 @@ flavorizr:
         name: "Astro Admin"
       android:
         applicationId: "com.example.astro.admin"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path_android: "assets/images/user/user_app.jpg"
+  image_path_ios: "assets/images/user/user_app.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/user/user_app.jpg"
+  
+# Separate configurations for flavors
+flutter_icons_user:
+  android: "launcher_icon"
+  ios: true
+  image_path_android: "assets/images/user/user_app.jpg"
+  image_path_ios: "assets/images/user/user_app.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/user/user_app.jpg"
+  flavor_name: "user"
+
+flutter_icons_admin:
+  android: "launcher_icon"
+  ios: true
+  image_path_android: "assets/images/admin/admin_app.jpg"
+  image_path_ios: "assets/images/admin/admin_app.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/admin/admin_app.jpg"
+  flavor_name: "admin"

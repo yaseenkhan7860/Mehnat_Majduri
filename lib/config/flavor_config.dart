@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-
-enum Flavor {
-  user,
-  admin,
-}
+import 'package:astro/flavors.dart';
 
 class FlavorConfig {
   final Flavor flavor;
@@ -23,7 +19,7 @@ class FlavorConfig {
     required ThemeData theme,
     required String baseUrl,
   }) {
-    _instance ??= FlavorConfig._internal(
+    _instance = FlavorConfig._internal(
       flavor: flavor,
       name: name,
       primaryColor: primaryColor,
@@ -52,4 +48,5 @@ class FlavorConfig {
 
   static bool isUser() => _instance!.flavor == Flavor.user;
   static bool isAdmin() => _instance!.flavor == Flavor.admin;
+  static bool isInstructor() => _instance!.flavor == Flavor.instructor;
 } 

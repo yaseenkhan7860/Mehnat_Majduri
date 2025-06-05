@@ -1,0 +1,240 @@
+// FIRESTORE RULES
+// Copy these rules to the Firestore Rules section in Firebase Console
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+             request.auth.token.email == 'astroapp.admin@astroapp.com';
+    }
+    
+    // Function to check if the user is an instructor
+    function isInstructor() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/instructors/$(request.auth.uid));
+    }
+    
+    // Function to check if the user is a regular user
+    function isUser() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    // Function to check if the user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Admins collection
+    match /admins/{userId} {
+      // Only admins can read admin data
+      allow read: if isAdmin();
+      
+      // Only super admins (through backend) can create/update/delete admin records
+      allow create, update, delete: if false;
+    }
+    
+    // Instructors collection
+    match /instructors/{userId} {
+      // Allow admins to read all instructor data
+      // Allow instructors to read their own data
+      allow read: if isAdmin() || (isInstructor() && isOwner(userId));
+      
+      // Only admins can create instructors
+      allow create: if isAdmin();
+      
+      // Instructors can update their own data, admins can update any instructor data
+      allow update: if isAdmin() || (isInstructor() && isOwner(userId));
+      
+      // Only admins can delete instructors
+      allow delete: if isAdmin();
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Allow users to read their own data
+      // Allow admins to read all user data
+      // Allow instructors to read user data
+      allow read: if isAdmin() || isInstructor() || (isUser() && isOwner(userId));
+      
+      // Users can create their own records, admins can create users
+      allow create: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      
+      // Users can update their own data, admins can update any user data
+      allow update: if isAdmin() || (isUser() && isOwner(userId));
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Courses collection
+    match /courses/{courseId} {
+      // Anyone can read course data
+      allow read: if isAuthenticated();
+      
+      // Only admins and instructors can create courses
+      allow create: if isAdmin() || isInstructor();
+      
+      // Only admins and the instructor who created the course can update it
+      allow update: if isAdmin() || 
+                     (isInstructor() && resource.data.instructorId == request.auth.uid);
+      
+      // Only admins can delete courses
+      allow delete: if isAdmin();
+      
+      // Course enrollments subcollection
+      match /enrollments/{enrollmentId} {
+        allow read: if isAuthenticated();
+        allow create: if isUser() || isAdmin();
+        allow update, delete: if isAdmin();
+      }
+      
+      // Course content subcollection
+      match /content/{contentId} {
+        allow read: if isAuthenticated();
+        allow create, update: if isAdmin() || 
+                              (isInstructor() && get(/databases/$(database)/documents/courses/$(courseId)).data.instructorId == request.auth.uid);
+        allow delete: if isAdmin();
+      }
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      // Anyone can read product data
+      allow read: if isAuthenticated();
+      
+      // Only admins can create, update, or delete products
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Users can read their own orders, admins can read all orders
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Authenticated users can create orders
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Only admins can update or delete orders
+      allow update, delete: if isAdmin();
+    }
+    
+    // Live sessions collection
+    match /liveSessions/{sessionId} {
+      // Anyone can read live session data
+      allow read: if isAuthenticated();
+      
+      // Only admins and instructors can create live sessions
+      allow create: if isAdmin() || isInstructor();
+      
+      // Only admins and the instructor who created the session can update it
+      allow update: if isAdmin() || 
+                    (isInstructor() && resource.data.instructorId == request.auth.uid);
+      
+      // Only admins can delete live sessions
+      allow delete: if isAdmin();
+      
+      // Participants subcollection
+      match /participants/{participantId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && participantId == request.auth.uid;
+        allow update, delete: if isAdmin() || 
+                             (isInstructor() && get(/databases/$(database)/documents/liveSessions/$(sessionId)).data.instructorId == request.auth.uid);
+      }
+    }
+    
+    // Settings collection (admin only)
+    match /settings/{settingId} {
+      // Only admins can read, create, update, or delete settings
+      allow read, write: if isAdmin();
+    }
+    
+    // Deny access to all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// STORAGE RULES
+// Copy these rules to the Storage Rules section in Firebase Console
+
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.email == 'astroapp.admin@astroapp.com';
+      // Note: We can't check Firestore from Storage rules directly
+    }
+    
+    // Function to check if the user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Public files - accessible to all authenticated users
+    match /public/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Admin-only files
+    match /admin/{fileName} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Course content files
+    match /courses/{courseId}/{fileName} {
+      allow read: if isAuthenticated();
+      // We can't use get() in Storage rules to check instructor status
+      // So we'll rely on the admin check only
+      allow write: if isAdmin();
+    }
+    
+    // User profile images - separate folders for each user type
+    match /admins/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() && isOwner(userId);
+    }
+    
+    match /instructors/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      // Allow instructors to update their own profiles and admins to update any
+      allow write: if isOwner(userId) || isAdmin();
+    }
+    
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      // Allow users to update their own profiles and admins to update any
+      allow write: if isOwner(userId) || isAdmin();
+    }
+    
+    // Product images
+    match /products/{productId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Deny access to all other files by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+} 

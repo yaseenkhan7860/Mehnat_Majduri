@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:astro/app.dart';
 import 'package:astro/flavors.dart';
-import 'package:astro/config/flavor_config.dart' as config;
-import 'package:astro/core/theme/app_themes.dart';
+import 'package:astro/config/flavor_config.dart';
 import 'package:astro/config/firebase_config.dart';
 
 void main() async {
@@ -13,17 +12,23 @@ void main() async {
   F.appFlavor = Flavor.user;
   
   // Initialize User app flavor config
-  config.FlavorConfig(
-    flavor: config.Flavor.user,
+  FlavorConfig(
+    flavor: Flavor.user,
     name: F.title,
-    primaryColor: Colors.blue,
-    secondaryColor: Colors.lightBlue,
-    theme: AppThemes.getUserTheme(),
+    primaryColor: const Color(0xFFFFB74D),  // Primary orange
+    secondaryColor: const Color(0xFFFF9800), // Secondary orange
+    // Use a basic theme here, the real theme will be set in App
+    theme: ThemeData(
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFFFFB74D),
+        secondary: Color(0xFFFF9800),
+      ),
+    ),
     baseUrl: "https://api.astro.com/user",
   );
   
   // Initialize Firebase for this flavor
   await FirebaseConfig.initializeFirebase();
   
-  runApp(const App());
+  runApp(const App(flavor: 'user'));
 } 

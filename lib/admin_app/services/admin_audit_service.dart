@@ -9,43 +9,35 @@ class AdminAuditService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   
   /// Log an admin action for auditing purposes
-  Future<void> logAdminAction(
-    String actionType, 
-    Map<String, dynamic> details, {
-    String? targetUserId,
-    String? notes,
-  }) async {
+  Future<void> logAdminAction(String action, Map<String, dynamic> details) async {
     try {
-      final admin = _auth.currentUser;
-      if (admin == null) {
-        throw Exception('No authenticated admin user found');
+      final adminUser = _auth.currentUser;
+      if (adminUser == null) {
+        debugPrint('AdminAuditService: No admin user logged in, cannot log action: $action');
+        return; // Return silently instead of throwing exception
       }
-      
-      // Get device info
-      String deviceInfo = '';
-      try {
-        deviceInfo = Platform.operatingSystem + ' ' + Platform.operatingSystemVersion;
-      } catch (e) {
-        // Web platform or error getting device info
-        deviceInfo = 'Unknown device';
+
+      // Check if the user has a valid token
+      final idToken = await adminUser.getIdToken();
+      if (idToken == null || idToken.isEmpty) {
+        debugPrint('AdminAuditService: Invalid token for user ${adminUser.uid}');
+        return;
       }
-      
-      // Create the audit log entry
+
+      debugPrint('AdminAuditService: Logging action $action for admin ${adminUser.email}');
+
       await _firestore.collection('admin_logs').add({
-        'adminUid': admin.uid,
-        'adminEmail': admin.email,
-        'actionType': actionType,
+        'action': action,
         'details': details,
-        'targetUserId': targetUserId,
-        'notes': notes,
+        'adminId': adminUser.uid,
+        'adminEmail': adminUser.email,
         'timestamp': FieldValue.serverTimestamp(),
-        'deviceInfo': deviceInfo,
+        'type': 'admin_action',
       });
       
-      debugPrint('Admin action logged: $actionType');
+      debugPrint('AdminAuditService: Successfully logged action $action');
     } catch (e) {
-      debugPrint('Error logging admin action: $e');
-      // Don't throw - we don't want logging failures to break functionality
+      debugPrint('AdminAuditService: Error logging admin action: $e');
     }
   }
   
@@ -91,5 +83,84 @@ class AdminAuditService {
         .orderBy('timestamp', descending: true)
         .limit(50)
         .snapshots();
+  }
+
+  Stream<QuerySnapshot> getAdminLogs({
+    String? adminId,
+    String? action,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) {
+    Query query = _firestore
+        .collection('admin_logs')
+        .orderBy('timestamp', descending: true);
+
+    if (adminId != null) {
+      query = query.where('adminId', isEqualTo: adminId);
+    }
+
+    if (action != null) {
+      query = query.where('action', isEqualTo: action);
+    }
+
+    if (startDate != null) {
+      query = query.where('timestamp', isGreaterThanOrEqualTo: startDate);
+    }
+
+    if (endDate != null) {
+      query = query.where('timestamp', isLessThanOrEqualTo: endDate);
+    }
+
+    return query.snapshots();
+  }
+
+  Future<void> clearOldLogs(int daysToKeep) async {
+    try {
+      final cutoffDate = DateTime.now().subtract(Duration(days: daysToKeep));
+      final snapshot = await _firestore
+          .collection('admin_logs')
+          .where('timestamp', isLessThan: cutoffDate)
+          .get();
+
+      final batch = _firestore.batch();
+      for (var doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      print('Error clearing old logs: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getAdminStats(String adminId) async {
+    try {
+      final today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day);
+
+      final todayLogs = await _firestore
+          .collection('admin_logs')
+          .where('adminId', isEqualTo: adminId)
+          .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
+          .count()
+          .get();
+
+      final totalLogs = await _firestore
+          .collection('admin_logs')
+          .where('adminId', isEqualTo: adminId)
+          .count()
+          .get();
+
+      return {
+        'todayActions': todayLogs.count ?? 0,
+        'totalActions': totalLogs.count ?? 0,
+      };
+    } catch (e) {
+      print('Error getting admin stats: $e');
+      return {
+        'todayActions': 0,
+        'totalActions': 0,
+      };
+    }
   }
 } 

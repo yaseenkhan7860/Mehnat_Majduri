@@ -1,0 +1,22 @@
+{"users": [
+{
+  "localId": "9lEwCRXziPRQglBe9Bzkz1I29U72",
+  "email": "astroapp.admin@astroapp.com",
+  "emailVerified": false,
+  "passwordHash": "9YhmPI0AepAWaBR1evArXZRrSFVw2OCEtAEQBe9kSZ+n77aHEBUTT+jyf5QLEbUQ+jn/QLMJkTXpXCfVL9BdHQ==",
+  "salt": "JjEH0wE5TDOnNQ==",
+  "lastSignedInAt": "1748665929880",
+  "createdAt": "1748594840768",
+  "disabled": false,
+  "providerUserInfo": []
+},
+{
+  "localId": "g7Q7R2jkT0UlONGx0SwXK9LdJ832",
+  "email": "mohammedyaseenkhan.pathan@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "lYg7+1S0tWAtRJTSv6+wEk/eOmrr0onRWjHGHFVh/e494wIT4XSXvyzopOmuDQFtB+rYtEVzDKEshe4OEiR5sA==",
+  "salt": "ilmND/tGu1sCAw==",
+  "lastSignedInAt": "1748584823850",
+  "createdAt": "1748577550701",
+  "providerUserInfo": []
+}]}

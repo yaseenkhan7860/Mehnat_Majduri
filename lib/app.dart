@@ -3,15 +3,45 @@ import 'package:astro/config/flavor_config.dart' as flavor_config;
 import 'package:astro/user_app/screens/user_login_screen.dart';
 import 'package:astro/user_app/screens/user_register_screen.dart';
 import 'package:astro/user_app/screens/user_home_screen.dart';
+import 'package:astro/user_app/screens/user_profile_screen.dart';
+import 'package:astro/user_app/screens/instructor_home_screen.dart';
+import 'package:astro/user_app/screens/subscription_plans_screen.dart';
 import 'package:astro/admin_app/screens/admin_login_screen.dart';
-import 'package:astro/admin_app/screens/admin_register_screen.dart';
 import 'package:astro/admin_app/screens/admin_home_screen.dart';
 import 'package:astro/shared/services/auth_service.dart';
 import 'package:astro/flavors.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class App extends StatelessWidget {
-  const App({super.key});
+class App extends StatefulWidget {
+  final String flavor;
+
+  const App({
+    super.key,
+    required this.flavor,
+  });
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  PackageInfo? _packageInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    _initPackageInfo();
+  }
+
+  Future<void> _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _packageInfo = info;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,46 +49,75 @@ class App extends StatelessWidget {
     
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(
+          create: (_) => AuthService(),
+          lazy: false,
+        ),
       ],
-      child: MaterialApp(
-        title: F.title,
-        theme: config.theme,
-        initialRoute: '/login',
-        routes: {
-          '/login': (context) => _buildLoginScreen(),
-          '/register': (context) => _buildRegisterScreen(),
-          '/home': (context) => _buildHomeScreen(),
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812), // Design size based on iPhone X
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return MaterialApp(
+            title: '${F.title} ${_packageInfo?.version ?? ''}',
+            theme: config.theme,
+            initialRoute: _getInitialRoute(),
+            onGenerateRoute: _generateRoute,
+            debugShowCheckedModeBanner: false,
+          );
         },
-        debugShowCheckedModeBanner: false,
       ),
     );
   }
   
-  Widget _buildLoginScreen() {
-    switch (F.appFlavor) {
-      case Flavor.user:
-        return const UserLoginScreen();
-      case Flavor.admin:
-        return const AdminLoginScreen();
+  String _getInitialRoute() {
+    switch (widget.flavor) {
+      case 'admin':
+        return '/admin_login';
+      case 'user':
+      default:
+        return '/login';
     }
   }
   
-  Widget _buildRegisterScreen() {
-    switch (F.appFlavor) {
-      case Flavor.user:
-        return const UserRegisterScreen();
-      case Flavor.admin:
-        return const AdminRegisterScreen();
+  Route<dynamic>? _generateRoute(RouteSettings settings) {
+    switch (widget.flavor) {
+      case 'admin':
+        return _generateAdminRoute(settings);
+      case 'user':
+      default:
+        return _generateUserRoute(settings);
     }
   }
-  
-  Widget _buildHomeScreen() {
-    switch (F.appFlavor) {
-      case Flavor.user:
-        return const UserHomeScreen();
-      case Flavor.admin:
-        return const AdminHomeScreen();
+
+  Route<dynamic>? _generateAdminRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/admin_login':
+        return MaterialPageRoute(builder: (_) => const AdminLoginScreen());
+      case '/admin_home':
+        return MaterialPageRoute(builder: (_) => const AdminHomeScreen());
+      default:
+        return MaterialPageRoute(builder: (_) => const AdminLoginScreen());
+    }
+  }
+
+  Route<dynamic>? _generateUserRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/login':
+        return MaterialPageRoute(builder: (_) => const UserLoginScreen());
+      case '/register':
+        return MaterialPageRoute(builder: (_) => const UserRegisterScreen());
+      case '/home':
+        return MaterialPageRoute(builder: (_) => const UserHomeScreen());
+      case '/instructor_home':
+        return MaterialPageRoute(builder: (_) => const InstructorHomeScreen());
+      case '/profile':
+        return MaterialPageRoute(builder: (_) => const UserProfileScreen());
+      case '/subscription_plans':
+        return MaterialPageRoute(builder: (_) => const SubscriptionPlansScreen());
+      default:
+        return MaterialPageRoute(builder: (_) => const UserLoginScreen());
     }
   }
 }

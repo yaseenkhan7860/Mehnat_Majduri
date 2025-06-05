@@ -1,0 +1,80 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.email == 'astroapp.admin@astroapp.com' &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Function to check if the user is an instructor
+    function isInstructor() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/instructors/$(request.auth.uid));
+    }
+    
+    // Function to check if the user is a regular user
+    function isUser() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    // Function to check if the user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Public files - accessible to all authenticated users
+    match /public/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Admin-only files
+    match /admin/{fileName} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Course content files
+    match /courses/{courseId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || 
+                   (isInstructor() && exists(/databases/$(database)/documents/courses/$(courseId)) && 
+                    get(/databases/$(database)/documents/courses/$(courseId)).data.instructorId == request.auth.uid);
+    }
+    
+    // User profile images - separate folders for each user type
+    match /admins/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() && isOwner(userId);
+    }
+    
+    match /instructors/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if (isInstructor() && isOwner(userId)) || isAdmin();
+    }
+    
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if (isUser() && isOwner(userId)) || isAdmin();
+    }
+    
+    // Product images
+    match /products/{productId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Deny access to all other files by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+} 

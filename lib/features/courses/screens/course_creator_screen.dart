@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:astro/flavors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CourseCreatorScreen extends StatefulWidget {
   const CourseCreatorScreen({super.key});
@@ -44,19 +45,21 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.w),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildSectionTitle('Course Information'),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 TextFormField(
                   controller: _courseTitleController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Course Title',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
                     hintText: 'Enter a compelling course title',
                   ),
                   validator: (value) {
@@ -66,12 +69,14 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 TextFormField(
                   controller: _courseDescriptionController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Course Description',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
                     hintText: 'Describe what students will learn',
                   ),
                   maxLines: 4,
@@ -82,15 +87,17 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Row(
                   children: [
                     Expanded(
                       flex: 2,
                       child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Category',
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                         ),
                         value: _selectedCategory,
                         items: const [
@@ -118,13 +125,15 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16.w),
                     Expanded(
                       child: TextFormField(
                         controller: _coursePriceController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Price (\$)',
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                           prefixText: '\$ ',
                         ),
                         keyboardType: TextInputType.number,
@@ -138,23 +147,23 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 _buildDifficultySelection(),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 _buildSectionTitle('Course Content'),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 _buildSectionsList(),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 ElevatedButton.icon(
                   onPressed: _addSection,
                   icon: const Icon(Icons.add),
                   label: const Text('Add Section'),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 ElevatedButton(
                   onPressed: _saveCourse,
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
+                    minimumSize: Size.fromHeight(50.h),
                   ),
                   child: const Text('Save Course'),
                 ),
@@ -169,8 +178,8 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
-        fontSize: 20,
+      style: TextStyle(
+        fontSize: 20.sp,
         fontWeight: FontWeight.bold,
       ),
     );
@@ -181,9 +190,9 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Difficulty Level:'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Wrap(
-          spacing: 8.0,
+          spacing: 8.w,
           children: [
             _buildDifficultyChip('Beginner'),
             _buildDifficultyChip('Intermediate'),
@@ -214,7 +223,7 @@ class _CourseCreatorScreenState extends State<CourseCreatorScreen> {
       itemCount: _sections.length,
       itemBuilder: (context, index) {
         return Card(
-          margin: const EdgeInsets.only(bottom: 8.0),
+          margin: EdgeInsets.only(bottom: 8.h),
           child: ListTile(
             leading: CircleAvatar(
               child: Text('${index + 1}'),

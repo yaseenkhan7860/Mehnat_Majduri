@@ -9,32 +9,27 @@ class FirebaseConfig {
 
   /// Initializes Firebase for the current flavor
   static Future<void> initializeFirebase() async {
+    FirebaseOptions options;
+
+    if (F.isAdminApp) {
+      options = const FirebaseOptions(
+        apiKey: "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4",
+        appId: "1:1072924359809:android:020850bdbfd3d9f9a6a180",
+        messagingSenderId: "1072924359809",
+        projectId: "astroapp-87ecd",
+        storageBucket: "astroapp-87ecd.firebasestorage.app",
+      );
+    } else {
+      options = const FirebaseOptions(
+        apiKey: "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4",
+        appId: "1:1072924359809:android:868b2405fe0f4b93a6a180",
+        messagingSenderId: "1072924359809",
+        projectId: "astroapp-87ecd",
+        storageBucket: "astroapp-87ecd.firebasestorage.app",
+      );
+    }
+
     try {
-      late FirebaseOptions options;
-
-      switch (F.appFlavor) {
-        case Flavor.user:
-          options = const FirebaseOptions(
-            apiKey: "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4",
-            appId: "1:1072924359809:android:868b2405fe0f4b93a6a180",
-            messagingSenderId: "1072924359809",
-            projectId: "astroapp-87ecd",
-            storageBucket: "astroapp-87ecd.firebasestorage.app",
-            authDomain: "astroapp-87ecd.firebaseapp.com",
-          );
-          break;
-        case Flavor.admin:
-          options = const FirebaseOptions(
-            apiKey: "AIzaSyBj3GzZS3aEUhv4wzXuv6u6knRariQIzO4",
-            appId: "1:1072924359809:android:020850bdbfd3d9f9a6a180",
-            messagingSenderId: "1072924359809",
-            projectId: "astroapp-87ecd",
-            storageBucket: "astroapp-87ecd.firebasestorage.app",
-            authDomain: "astroapp-87ecd.firebaseapp.com",
-          );
-          break;
-      }
-
       // Check if Firebase is already initialized
       if (Firebase.apps.isEmpty) {
         // Initialize Firebase with the appropriate options for the current flavor

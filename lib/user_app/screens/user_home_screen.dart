@@ -11,6 +11,10 @@ import 'package:astro/user_app/screens/user_courses_screen.dart';
 import 'package:astro/user_app/screens/user_live_screen.dart';
 import 'package:astro/user_app/screens/user_chat_screen.dart';
 import 'package:astro/user_app/screens/user_products_screen.dart';
+import 'package:astro/user_app/screens/user_profile_screen.dart';
+import 'package:astro/core/theme/app_themes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:async';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -21,6 +25,7 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   int _currentIndex = 0;
+  final PageController _pageController = PageController();
 
   final List<Widget> _screens = [
     const UserHomeContent(),
@@ -31,46 +36,112 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   ];
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        title: const Text('AstroApp'),
-        actions: [
-          // Subscription button with improved UI
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.card_membership, size: 18),
-              label: const Text('Subscription', 
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                )
+        elevation: 2,
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              width: 36.w,
+              height: 36.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple.shade800,
-                foregroundColor: Colors.white,
-                elevation: 3,
-                shadowColor: Colors.black.withOpacity(0.3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/user/user_app.jpg',
+                  fit: BoxFit.cover,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
               ),
-              onPressed: () {
-                // Navigate to subscription page
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              'AstroApp',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        automaticallyImplyLeading: false,
+        actions: [
+          // Subscription icon button with notification dot
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20.r),
+              onTap: () {
+                // Navigate to subscription plans page
+                Navigator.of(context).pushNamed('/subscription_plans');
               },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+          Padding(
+                        padding: EdgeInsets.all(8.w),
+                        child: Container(
+                          padding: EdgeInsets.all(4.w),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.workspace_premium,
+                            size: 22.sp,
+                            color: Colors.amber.shade700,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 6.w,
+                        right: 6.w,
+                        child: Container(
+                          width: 8.w,
+                          height: 8.w,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.w),
+              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           // Profile dropdown menu
           PopupMenuButton<String>(
-            icon: const Icon(Icons.account_circle),
-            onSelected: (value) {
+            icon: Icon(
+              Icons.account_circle,
+              color: Colors.deepOrange.shade400,
+              size: 24.sp,
+            ),
+            onSelected: (value) async {
               // Handle menu item selection
               switch (value) {
                 case 'profile':
-                  // Navigate to profile page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+                  );
                   break;
                 case 'settings':
                   // Navigate to settings page
@@ -80,6 +151,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   break;
                 case 'privacy':
                   // Navigate to privacy policy page
+                  break;
+                case 'logout':
+                  await authService.signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  }
                   break;
               }
             },
@@ -120,27 +197,47 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   dense: true,
                 ),
               ),
+              const PopupMenuDivider(),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: ListTile(
+                  leading: Icon(Icons.logout, color: Colors.red),
+                  title: Text('Logout', style: TextStyle(color: Colors.red)),
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+              ),
             ],
           ),
         ],
       ),
-      body: _screens[_currentIndex],
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: _screens,
+      ),
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
   Widget _buildBottomNavBar() {
+    final theme = Theme.of(context);
+    
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 16.h),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(24.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              spreadRadius: 0,
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 12,
+              spreadRadius: 1,
               offset: const Offset(0, 2),
             ),
           ],
@@ -150,22 +247,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
+              _pageController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
             },
             type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.white,
-            selectedItemColor: Theme.of(context).primaryColor,
-            unselectedItemColor: Colors.grey.shade400,
+            backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+            selectedItemColor: Colors.deepOrange.shade600,
+            unselectedItemColor: Colors.grey.shade600,
             showSelectedLabels: true,
             showUnselectedLabels: true,
-            selectedLabelStyle: const TextStyle(
+            selectedLabelStyle: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 12,
+              fontSize: 10.sp,
             ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 11,
+            unselectedLabelStyle: TextStyle(
+              fontSize: 9.sp,
             ),
             elevation: 0,
             items: [
@@ -175,6 +274,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               _buildNavItem(Icons.chat_outlined, Icons.chat, 'Chat', 3),
               _buildNavItem(Icons.shopping_bag_outlined, Icons.shopping_bag, 'Products', 4),
             ],
+            selectedIconTheme: IconThemeData(
+              shadows: [
+                Shadow(
+                  color: Colors.deepOrange.withOpacity(0.3),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -183,7 +290,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   
   BottomNavigationBarItem _buildNavItem(IconData unselectedIcon, IconData selectedIcon, String label, int index) {
     return BottomNavigationBarItem(
-      icon: Icon(_currentIndex == index ? selectedIcon : unselectedIcon),
+      icon: Icon(
+        _currentIndex == index ? selectedIcon : unselectedIcon,
+        size: 22.sp,
+      ),
       label: label,
     );
   }
@@ -199,7 +309,7 @@ class UserHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 80.0),
+      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.h, bottom: 80.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -207,21 +317,21 @@ class UserHomeContent extends StatelessWidget {
           Card(
             elevation: 4,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.auto_stories, color: Colors.deepOrange, size: 28),
-                      SizedBox(width: 12),
+                      Icon(Icons.auto_stories, color: Colors.deepOrange, size: 20.sp),
+                      SizedBox(width: 8.w),
                       Text(
                         'Sloka of the Day',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -267,12 +377,12 @@ class UserHomeContent extends StatelessWidget {
           Text(
             'Shortcut Options',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
           
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           
           // Two feature cards side by side (Shortcut Options)
           Row(
@@ -324,83 +434,16 @@ class UserHomeContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Featured Offers',
+                'Highlights',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 12),
-              Container(
+              SizedBox(
                 height: 180,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.deepPurple.shade400,
-                      Colors.deepPurple.shade800,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Special Offer',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Get 30% Off on Premium Consultations',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.deepPurple.shade800,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              ),
-                              child: const Text('Book Now'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Center(
-                          child: Icon(
-                            Icons.auto_awesome,
-                            size: 80,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                child: _HighlightsBannerCarousel(),
               ),
             ],
           ),
@@ -417,7 +460,7 @@ class UserHomeContent extends StatelessWidget {
                   Text(
                     'Latest News & Articles',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -722,7 +765,6 @@ class UserHomeScreenShared extends SharedHomeScreen {
   Widget buildBody(BuildContext context) {
     // Use the AuthService to get the user's role
     final authService = Provider.of<AuthService>(context);
-    final isInstructor = authService.isInstructor;
     
     // Show loading indicator while waiting for role
     if (authService.currentUser != null && authService.userRole == null) {
@@ -734,83 +776,45 @@ class UserHomeScreenShared extends SharedHomeScreen {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            isInstructor 
-                ? 'Welcome to Astro Expert Platform' 
-                : 'Welcome to Astro Learning',
-            style: const TextStyle(
-              fontSize: 24,
+          const Text(
+            'Welcome to Astro Learning',
+            style: TextStyle(
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
           
-          // Show different content based on user role
-          if (isInstructor) ...[
-            _buildStatCard(
-              context,
-              'Students',
-              '120',
-              Icons.people,
-            ),
-            _buildStatCard(
-              context,
-              'Courses',
-              '8',
-              Icons.book,
-            ),
-            _buildStatCard(
-              context,
-              'Earnings',
-              '\$2,450',
-              Icons.attach_money,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => const CourseCreatorScreen()),
-                );
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Create New Course'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-              ),
-            ),
-          ] else ...[
-            _buildFeatureCard(
-              context,
-              'Find Courses',
-              'Browse our catalog of courses',
-              Icons.school,
-              () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => const CourseListScreen()),
-                );
-              },
-            ),
-            _buildFeatureCard(
-              context,
-              'My Learning',
-              'Continue your enrolled courses',
-              Icons.play_lesson,
-              () {
-                // Navigate to my learning screen
-              },
-            ),
-            _buildFeatureCard(
-              context,
-              'Connect with Experts',
-              'Get personalized guidance',
-              Icons.people,
-              () {
-                // Navigate to experts list screen
-              },
-            ),
-          ],
+          _buildFeatureCard(
+            context,
+            'Find Courses',
+            'Browse our catalog of courses',
+            Icons.school,
+            () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => const CourseListScreen()),
+              );
+            },
+          ),
+          _buildFeatureCard(
+            context,
+            'My Learning',
+            'Continue your enrolled courses',
+            Icons.play_lesson,
+            () {
+              // Navigate to my learning screen
+            },
+          ),
+          _buildFeatureCard(
+            context,
+            'Connect with Experts',
+            'Get personalized guidance',
+            Icons.people,
+            () {
+              // Navigate to experts list screen
+            },
+          ),
         ],
       ),
     );
@@ -818,15 +822,11 @@ class UserHomeScreenShared extends SharedHomeScreen {
 
   @override
   Widget buildDrawer(BuildContext context) {
-    // Use the AuthService to get the user's role
-    final authService = Provider.of<AuthService>(context);
-    final isInstructor = authService.isInstructor;
-    
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          _buildDrawerHeader(context, isInstructor),
+          _buildDrawerHeader(context),
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text('Home'),
@@ -842,51 +842,14 @@ class UserHomeScreenShared extends SharedHomeScreen {
               // Navigate to profile screen
             },
           ),
-          
-          // Conditional menu items based on role
-          if (isInstructor) ...[
-            ListTile(
-              leading: const Icon(Icons.create),
-              title: const Text('Create Course'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => const CourseCreatorScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.insights),
-              title: const Text('Analytics'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to analytics screen
-              },
-            ),
-          ] else ...[
-            ListTile(
-              leading: const Icon(Icons.school),
-              title: const Text('Browse Courses'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => const CourseListScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.play_lesson),
-              title: const Text('My Learning'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to my learning screen
-              },
-            ),
-          ],
-          
-          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.school),
+            title: const Text('My Courses'),
+            onTap: () {
+              Navigator.pop(context);
+              // Navigate to courses screen
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
@@ -895,11 +858,12 @@ class UserHomeScreenShared extends SharedHomeScreen {
               // Navigate to settings screen
             },
           ),
+          const Divider(),
           ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Logout', style: TextStyle(color: Colors.red)),
             onTap: () async {
-              Navigator.pop(context);
+              final authService = Provider.of<AuthService>(context, listen: false);
               await authService.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushReplacementNamed('/login');
@@ -911,8 +875,8 @@ class UserHomeScreenShared extends SharedHomeScreen {
     );
   }
 
-  Widget _buildDrawerHeader(BuildContext context, bool isInstructor) {
-    final authService = Provider.of<AuthService>(context);
+  Widget _buildDrawerHeader(BuildContext context) {
+    final user = Provider.of<AuthService>(context).currentUser;
     
     return DrawerHeader(
       decoration: BoxDecoration(
@@ -924,24 +888,32 @@ class UserHomeScreenShared extends SharedHomeScreen {
           CircleAvatar(
             radius: 30,
             backgroundColor: Colors.white,
-            child: Icon(
-              isInstructor ? Icons.school : Icons.person,
-              color: Theme.of(context).primaryColor,
-              size: 30,
+            child: Text(
+              user?.displayName?.isNotEmpty == true
+                  ? user!.displayName![0].toUpperCase()
+                  : 'U',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            isInstructor ? 'Astro Expert' : 'Astro User',
+            user?.displayName ?? 'User',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 5),
           Text(
-            authService.currentUser?.email ?? 'example@email.com',
+            user?.email ?? '',
             style: const TextStyle(
               color: Colors.white70,
+              fontSize: 14,
             ),
           ),
         ],
@@ -1001,11 +973,440 @@ class UserCoursesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 80.0),
-      child: Column(
-        // ... existing code ...
+    return const UserCoursesScreenContent();
+  }
+}
+
+class UserCoursesScreenContent extends StatefulWidget {
+  const UserCoursesScreenContent({super.key});
+
+  @override
+  State<UserCoursesScreenContent> createState() => _UserCoursesScreenContentState();
+}
+
+class _UserCoursesScreenContentState extends State<UserCoursesScreenContent> with SingleTickerProviderStateMixin {
+  int _selectedCategoryIndex = 0;
+  final List<String> _categories = ['Featured', 'Astrology', 'Numerology', 'Tarot', 'Vastu'];
+  late TabController _tabController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _categories.length, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        _selectedCategoryIndex = _tabController.index;
+      });
+    });
+  }
+  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _buildImprovedCategoryNavBar(),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: List.generate(_categories.length, (index) {
+              return ListView(
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  // Popular courses section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _getCoursesSectionTitle(),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('See All'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Course cards
+                  _buildCourseCard(
+                    title: 'Introduction to ${_categories[index]}',
+                    instructor: 'Prof. Jane Smith',
+                    duration: '8 hours',
+                    level: 'Beginner',
+                    image: 'https://via.placeholder.com/150/6A1B9A/FFFFFF?text=${_categories[index]}',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCourseCard(
+                    title: 'Advanced ${_categories[index]} Techniques',
+                    instructor: 'Dr. Michael Brown',
+                    duration: '12 hours',
+                    level: 'Intermediate',
+                    image: 'https://via.placeholder.com/150/00796B/FFFFFF?text=${_categories[index]}',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCourseCard(
+                    title: '${_categories[index]} Fundamentals',
+                    instructor: 'Sarah Johnson',
+                    duration: '6 hours',
+                    level: 'Beginner',
+                    image: 'https://via.placeholder.com/150/C62828/FFFFFF?text=${_categories[index]}',
+                  ),
+                ],
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImprovedCategoryNavBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 3,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        labelColor: Theme.of(context).primaryColor,
+        unselectedLabelColor: Colors.grey.shade600,
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        unselectedLabelStyle: const TextStyle(fontSize: 14),
+        indicatorColor: Theme.of(context).primaryColor,
+        indicatorWeight: 3,
+        indicatorSize: TabBarIndicatorSize.label,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        tabs: _categories.map((category) => Tab(text: category)).toList(),
+      ),
+    );
+  }
+
+  String _getCoursesSectionTitle() {
+    switch (_selectedCategoryIndex) {
+      case 0:
+        return 'Popular Courses';
+      case 1:
+        return 'Astrology Courses';
+      case 2:
+        return 'Numerology Courses';
+      case 3:
+        return 'Tarot Courses';
+      case 4:
+        return 'Vastu Courses';
+      default:
+        return 'Popular Courses';
+    }
+  }
+
+  Widget _buildCourseCard({
+    required String title,
+    required String instructor,
+    required String duration,
+    required String level,
+    required String image,
+  }) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Course image
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              child: Image.network(
+                image,
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 150,
+                    color: Colors.grey.shade200,
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'By $instructor',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Chip(
+                        label: Text(duration),
+                        backgroundColor: Colors.blue.shade100,
+                        labelStyle: TextStyle(color: Colors.blue.shade800),
+                        padding: EdgeInsets.zero,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      const SizedBox(width: 8),
+                      Chip(
+                        label: Text(level),
+                        backgroundColor: Colors.green.shade100,
+                        labelStyle: TextStyle(color: Colors.green.shade800),
+                        padding: EdgeInsets.zero,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.play_circle_outline),
+                        label: const Text('View Course'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.bookmark_border, color: Theme.of(context).primaryColor),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HighlightsBannerCarousel extends StatefulWidget {
+  @override
+  _HighlightsBannerCarouselState createState() => _HighlightsBannerCarouselState();
+}
+
+class _HighlightsBannerCarouselState extends State<_HighlightsBannerCarousel> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  final List<Map<String, dynamic>> _banners = [
+    {
+      'title': 'Special Offer',
+      'subtitle': 'Get 30% Off on Premium Consultations',
+      'imageUrl': 'https://via.placeholder.com/600x300/6A1B9A/FFFFFF?text=Special+Offer',
+      'gradientColors': [Colors.deepPurple.shade400, Colors.deepPurple.shade800],
+    },
+    {
+      'title': 'New Course',
+      'subtitle': 'Learn Vedic Astrology Fundamentals',
+      'imageUrl': 'https://via.placeholder.com/600x300/00796B/FFFFFF?text=New+Course',
+      'gradientColors': [Colors.teal.shade400, Colors.teal.shade800],
+    },
+    {
+      'title': 'Live Session',
+      'subtitle': 'Join our weekly planetary transit discussion',
+      'imageUrl': 'https://via.placeholder.com/600x300/C62828/FFFFFF?text=Live+Session',
+      'gradientColors': [Colors.red.shade400, Colors.red.shade800],
+    },
+  ];
+  
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _startAutoSlide() {
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (_currentPage < _banners.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+      
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          _currentPage,
+          duration: Duration(milliseconds: 350),
+          curve: Curves.easeIn,
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (int page) {
+              setState(() {
+                _currentPage = page;
+              });
+            },
+            itemCount: _banners.length,
+            itemBuilder: (context, index) {
+              final banner = _banners[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: double.infinity,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // Image container
+                        Image.network(
+                          banner['imageUrl'],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: banner['gradientColors'],
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.auto_awesome,
+                                  size: 80,
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        // Gradient overlay
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.black.withOpacity(0.7),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Content
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                banner['title'],
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                banner['subtitle'],
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Page indicator dots
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(_banners.length, (index) {
+            return Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentPage == index
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey.shade300,
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 } 
